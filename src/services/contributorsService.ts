@@ -17,7 +17,7 @@ const getList = async (page: number): Promise<RepositoryContributor[]> => {
         data: contributors,
       } = await axios.get<RepositoryContributor[]>(`${GITHUB_API_REACT_REPOSITORY_CONTRIBUTORS}?per_page=${ContributorsPerPage}&page=${page}`, {
         headers: {
-          Authorization: `token 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`,
+          Authorization: `token ${process.env.REACT_APP_GITHUB_ACCESS_TOKEN}`,
         },
       });
     
