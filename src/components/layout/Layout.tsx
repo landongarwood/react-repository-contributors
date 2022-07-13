@@ -9,12 +9,10 @@ import { StyledHeader } from './partials/StyledHeader';
 export const Layout: FC<any> = ({ children }) => {
   return (
     <AntLayout className="layout">
-      <AntLayout>
-        <StyledHeader>Repository Contributors</StyledHeader>
-        <StyledContent>
-          {children}
-        </StyledContent>
-      </AntLayout>
+      <StyledHeader>React Repository Contributors</StyledHeader>
+      <StyledContent>
+        {children}
+      </StyledContent>
     </AntLayout>
   );
 };

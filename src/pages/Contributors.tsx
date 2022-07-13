@@ -1,94 +1,77 @@
 import { Avatar, Button, Card, List, Skeleton } from 'antd';
 import { FC, useEffect, useState } from 'react';
+import styled from 'styled-components';
+import { ContributorsPerPage } from '../constants';
+import contributorsService, { RepositoryContributor } from '../services/contributorsService'
 
-interface DataType {
-  gender?: string;
-  name: {
-    title?: string;
-    first?: string;
-    last?: string;
-  };
-  email?: string;
-  picture: {
-    large?: string;
-    medium?: string;
-    thumbnail?: string;
-  };
-  nat?: string;
-  loading: boolean;
-}
-
-const count = 5;
-const fakeDataUrl = `https://randomuser.me/api/?results=${count}&inc=name,gender,email,nat,picture&noinfo`;
+const LoadMoreWrapper = styled.div`
+  text-align: center;
+  margin-top: 12px;
+  height: 32px;
+  line-height: 32px;
+`;
 
 export const ContributorsPage: FC = () => {
   const [initLoading, setInitLoading] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState<DataType[]>([]);
-  const [list, setList] = useState<DataType[]>([]);
+  const [contributors, setContributors] = useState<RepositoryContributor[]>([]);
+  const [page, setPage] = useState<number>(1);
 
   useEffect(() => {
-    fetch(fakeDataUrl)
-      .then(res => res.json())
-      .then(res => {
-        setInitLoading(false);
-        setData(res.results);
-        setList(res.results);
-      });
+    contributorsService.getList(1)
+      .then((response) => {
+        setContributors(response)
+        setInitLoading(false)
+      })
   }, []);
 
-  const onLoadMore = () => {
+  const increasePage = () => {
+    setPage((prev) => prev + 1)
+  }
+
+  const onLoadMore = async () => {
     setLoading(true);
-    setList(
-      data.concat([...new Array(count)].map(() => ({ loading: true, name: {}, picture: {} }))),
-    );
-    fetch(fakeDataUrl)
-      .then(res => res.json())
-      .then(res => {
-        const newData = data.concat(res.results);
-        setData(newData);
-        setList(newData);
-        setLoading(false);
-        // Resetting window's offsetTop so as to display react-virtualized demo underfloor.
-        // In real scene, you can using public method of react-virtualized:
-        // https://stackoverflow.com/questions/46700726/how-to-use-public-method-updateposition-of-react-virtualized
-        window.dispatchEvent(new Event('resize'));
-      });
+
+    setContributors(contributors.concat([...new Array(ContributorsPerPage)].map(() => ({
+      loading: true,
+      login: "",
+      avatar_url: "",
+      url: "",
+      html_url: "",
+      contributions: 0,
+    }))))
+
+    setContributors(contributors.concat(await contributorsService.getList(page + 1)));
+    increasePage();
+
+    setLoading(false)
+    window.dispatchEvent(new Event('resize'));
   };
 
   const loadMore =
     !initLoading && !loading ? (
-      <div
-        style={{
-          textAlign: 'center',
-          marginTop: 12,
-          height: 32,
-          lineHeight: '32px',
-        }}
-      >
-        <Button onClick={onLoadMore}>loading more</Button>
-      </div>
+      <LoadMoreWrapper>
+        <Button onClick={onLoadMore}>load more</Button>
+      </LoadMoreWrapper>
     ) : null;
 
   return (
-    <Card title="React Repository Contributors">
+    <Card title="Contributors">
       <List
-        className="demo-loadmore-list"
         loading={initLoading}
         itemLayout="horizontal"
         loadMore={loadMore}
-        dataSource={list}
-        renderItem={item => (
+        dataSource={contributors}
+        renderItem={contributor => (
           <List.Item
-            actions={[<a key="list-loadmore-edit">edit</a>, <a key="list-loadmore-more">more</a>]}
+            actions={[<Button type="primary">View</Button>]}
           >
-            <Skeleton avatar title={false} loading={item.loading} active>
+            <Skeleton avatar title={false} loading={contributor.loading} active>
               <List.Item.Meta
-                avatar={<Avatar src={item.picture.large} />}
-                title={<a href="https://ant.design">{item.name?.last}</a>}
-                description="Ant Design, a design language for background applications, is refined by Ant UED Team"
+                avatar={<Avatar src={contributor.avatar_url} />}
+                title={<a href={contributor.url}>{contributor.login}</a>}
+                description={`Total contributions: ${contributor.contributions}`}
               />
-              <div>content</div>
             </Skeleton>
           </List.Item>
         )}

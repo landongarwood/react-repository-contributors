@@ -1,0 +1,1 @@
+export const ContributorsPerPage = 5;

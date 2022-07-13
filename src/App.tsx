@@ -1,12 +1,17 @@
 import React from 'react';
 
-import { BrowserRouter } from 'react-router-dom';
-import { Routes } from './routes';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { Layout } from './components/layout';
+import { ContributorsPage } from './pages/Contributors';
 
 function App() {
   return (
     <BrowserRouter>
-      <Routes />
+      <Layout>
+        <Routes>
+          <Route path='/' element={<ContributorsPage />} />
+        </Routes>
+      </Layout>
     </BrowserRouter>
   );
 }
