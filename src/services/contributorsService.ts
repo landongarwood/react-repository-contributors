@@ -13,15 +13,15 @@ export interface RepositoryContributor {
 }
 
 const getList = async (page: number): Promise<RepositoryContributor[]> => {
-    const {
-        data: contributors,
-      } = await axios.get<RepositoryContributor[]>(`${GITHUB_API_REACT_REPOSITORY_CONTRIBUTORS}?per_page=${ContributorsPerPage}&page=${page}`, {
-        headers: {
-          Authorization: `token ${process.env.REACT_APP_GITHUB_ACCESS_TOKEN}`,
-        },
-      });
-    
-    return contributors;
+  const {
+      data: contributors,
+    } = await axios.get<RepositoryContributor[]>(`${GITHUB_API_REACT_REPOSITORY_CONTRIBUTORS}?per_page=${ContributorsPerPage}&page=${page}`, {
+      headers: {
+        Authorization: `token ${process.env.REACT_APP_GITHUB_ACCESS_TOKEN}`,
+      },
+    });
+  
+  return contributors;
 };
 
 const services = {
