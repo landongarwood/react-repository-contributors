@@ -1,8 +1,9 @@
 import { Avatar, Button, Card, List, Skeleton } from 'antd';
 import { FC, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { ContributorsPerPage } from '../constants';
-import contributorsService, { RepositoryContributor } from '../services/contributorsService'
+import apiService, { RepositoryContributor } from '../services/apiService'
 
 const LoadMoreWrapper = styled.div`
   text-align: center;
@@ -18,7 +19,7 @@ export const ContributorsPage: FC = () => {
   const [page, setPage] = useState<number>(1);
 
   useEffect(() => {
-    contributorsService.getList(1)
+    apiService.getRepositoryContributors(1)
       .then((response) => {
         setContributors(response)
         setInitLoading(false)
@@ -41,7 +42,7 @@ export const ContributorsPage: FC = () => {
       contributions: 0,
     }))))
 
-    setContributors(contributors.concat(await contributorsService.getList(page + 1)));
+    setContributors(contributors.concat(await apiService.getRepositoryContributors(page + 1)));
     increasePage();
 
     setLoading(false)
@@ -64,7 +65,12 @@ export const ContributorsPage: FC = () => {
         dataSource={contributors}
         renderItem={contributor => (
           <List.Item
-            actions={[<Button type="primary">View</Button>]}
+            actions={[
+              (
+                <Link to={`/contributors/${contributor.login}`}>
+                  <Button type="primary">View</Button>
+                </Link>
+              )]}
           >
             <Skeleton avatar title={false} loading={contributor.loading} active>
               <List.Item.Meta
